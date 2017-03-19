@@ -11,6 +11,7 @@
     <div :class="$style.list">
       <product v-for="p in posts" :key="p.id" :post="p" />
       <br v-if="loading">
+      <a :class="$style.more" v-if="posts.length" href="https://producthunt.com">Keep hunting</a>
       <div :class="$style.loader" v-if="loading"></div>
     </div>
   </div>
@@ -35,10 +36,10 @@ export default {
   },
   created() {
     if (localStorage.phToken) {
-      console.log('phToken cache hit');
+      console.log('[PH] phToken cache hit');
       this.getPosts();
     } else {
-      console.log('phToken cache miss');
+      console.log('[PH] phToken cache miss');
       this._getAuth();
     }
   },
@@ -50,11 +51,10 @@ export default {
           grant_type: 'client_credentials'
         })
         .then(response => {
-          console.log('PH _getAuth:', response.body);
           localStorage.phToken = response.body.access_token;
         }, err => {
           localStorage.phToken = process.env.PH_TOKEN;
-          console.error('PH _getAuth:', err.body);
+          console.error('[PH] _getAuth:', err.body);
         }).then(() => {
           if (localStorage.phToken) {
             this.getPosts();
@@ -65,20 +65,22 @@ export default {
       if (!localStorage.phToken) {
         this._getAuth();
       }
-      console.log('getting posts...');
-      this.loading = true;
+      console.log('[PH] getting posts...');
+      if (!this.posts.length) {
+        this.loading = true;
+      }
       this.$http.get(`${base}/posts?days_ago=0`, {
         headers: {
           'Authorization': 'Bearer ' + localStorage.phToken
         }
       }).then(response => {
-        // console.log('PH posts:', response.body);
+        // console.log('[PH] PH posts:', response.body);
+        this.loading = false;
         this.posts = response.body.posts;
         localStorage.posts = JSON.stringify(response.body.posts);
-        this.loading = false;
-        console.info('done. all set!');
+        console.info('[PH] done. all set!');
       }, err => {
-        console.error('PH error:', err);
+        console.error('[PH] error:', err);
         this.loading = false;
         if (err.status == 401) {
           delete localStorage.phToken;
@@ -163,5 +165,14 @@ export default {
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg);
   }
+}
+.more {
+  display: block;
+  padding: 1rem;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 1px;
+  text-decoration: underline;
 }
 </style>

@@ -44,8 +44,11 @@ body {
 }
 
 a {
-  color: rgb(213, 181, 255);
+  color: rgba(#fff, 0.9);
   text-decoration: none;
+  &:hover {
+    color: rgba(#fff, 1);
+  }
 }
 
 p {

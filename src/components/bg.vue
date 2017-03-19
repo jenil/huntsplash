@@ -1,6 +1,6 @@
 <template>
 <div :id="$style.bg" v-if="BG" :style="{ 'background-color': imgColor}">
-  <img :src="BG" alt="" @load="bgLoaded = true" :class="{ [$style.loaded]: bgLoaded }">
+  <img :src="BG" alt="" @load="loadedImg" @error="errorImg" :class="{ [$style.loaded]: bgLoaded }" ref="BG" crossOrigin="anonymous">
   <div :class="$style.meta" v-if="author.name">
     <svg width="16px" viewBox="0 0 104 90" version="1.1" aria-label="Unsplash" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
         <title>Unsplash</title>
@@ -18,15 +18,20 @@
 export default {
   name: 'bg',
   created() {
+    // if (this.BG.indexOf('data:') == 0) {
+    //   console.time('BG cached');
+    // } else {
+      console.time('BG');
+    // }
     if (!process.env.UNSPLASH_APP_ID) {
-      console.error('No UNSPLASH_APP_ID!');
+      console.error('[USP] No UNSPLASH_APP_ID!');
     }
     this.checkImage();
   },
   data() {
     return {
       bgLoaded: false,
-      BG: localStorage.BG || '',
+      BG: localStorage.bgData || localStorage.BG || '',
       imgColor: localStorage.imgColor || '#333',
       author: localStorage.author ? JSON.parse(localStorage.author) : {}
     }
@@ -35,11 +40,11 @@ export default {
     checkImage() {
       let then = localStorage.tsUpdatedImage ? JSON.parse(localStorage.tsUpdatedImage) : null;
       let now = new Date().getTime();
-      console.log('image since:', (now - then) / 1000, 'secs -', (now - then) / 1000 / 3600, 'hrs');
+      console.log('[USP] image since:', (now - then) / 1000, 'secs -', (now - then) / 1000 / 3600, 'hrs');
       if (then && (now - then) / 1000 < 12 * 3600) {
-        console.log('using old image');
+        console.log('[USP] using old image');
       } else {
-        console.log('getting new image');
+        console.log('[USP] getting new image');
         this.getImage();
       }
     },
@@ -53,8 +58,8 @@ export default {
           }
         })
         .then(response => {
-          // console.log('unsplash response', response.body);
-          console.log('got new image');
+          // console.log('[USP] unsplash response', response.body);
+          console.log('[USP] got new image');
           const img = response.body;
 
           this.BG = img.urls.full;
@@ -74,13 +79,48 @@ export default {
           localStorage.tsUpdatedImage = new Date().getTime();
         }, err => {
           // error callback
-          console.error('Unsplash:', err.body);
+          console.error('[USP] Unsplash:', err.body);
           delete localStorage.clear();
 
           // fallback
           this.BG = 'https://source.unsplash.com/random';
           localStorage.BG = 'https://source.unsplash.com/random';
         });
+    },
+    loadedImg() {
+      console.timeEnd('BG');
+      this.bgLoaded = true;
+      console.log('[USP] 🏞 loaded from', this.BG.indexOf('data:') === 0 ? 'cache' : 'source');
+      console.info('[USP] done. all set!');
+      var vm = this;
+      if (this.BG.indexOf('data') === -1) {
+        this.$http.get(this.BG).then(response => {
+          return response.blob();
+        }).then(blob => {
+          var url = URL.createObjectURL(blob);
+          var img = new Image();
+          img.setAttribute('crossOrigin', 'anonymous');
+          img.onload = function() {
+            var canvas = document.createElement("canvas");
+            canvas.width = (window.innerWidth || 1280) * window.devicePixelRatio;
+            canvas.height = (this.height / this.width) * canvas.width;
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+            var data = canvas.toDataURL("image/jpeg");
+            localStorage.bgData = data;
+            console.info('BG Cached! 🍺');
+          };
+          console.log('[USP] trying to cache from', url);
+          img.src = url;
+        }).catch(err => {
+          console.error('[USP] Failed to Cache BG');
+        });
+      }
+    },
+    errorImg() {
+      console.warn('BG Cache missed, fallback to fetch image from source');
+      this.BG = localStorage.BG;
+      delete localStorage.BGblob;
     }
   }
 }
