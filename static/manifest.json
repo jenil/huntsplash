@@ -1,6 +1,6 @@
 {
   "name": "HuntSplash",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "manifest_version": 2,
   "description": "See beautiful photos along with top trending products on every new tab you open in Google Chrome.",
   "chrome_url_overrides": {
@@ -28,5 +28,5 @@
     "main.js",
     "client.*.css"
   ],
-  "content_security_policy": "script-src https://images.unsplash.com 'self' 'unsafe-eval'; object-src 'self'"
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

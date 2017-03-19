@@ -14,6 +14,9 @@ export default {
   components: {
     bg,
     sidebar
+  },
+  created() {
+    console.info('VERSION', process.env.VERSION);
   }
 }
 </script>

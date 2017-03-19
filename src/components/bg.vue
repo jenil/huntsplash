@@ -18,6 +18,9 @@
 export default {
   name: 'bg',
   created() {
+    if (!process.env.UNSPLASH_APP_ID) {
+      console.error('No UNSPLASH_APP_ID!');
+    }
     this.checkImage();
   },
   data() {

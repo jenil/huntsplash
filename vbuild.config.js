@@ -12,6 +12,7 @@ module.exports = options => ({
   port: 3000,
   host: '0.0.0.0',
   env: {
+    VERSION: require('./static/manifest.json').version,
     UNSPLASH_APP_ID: '',
     PH_KEY: '',
     PH_SECRET: '',

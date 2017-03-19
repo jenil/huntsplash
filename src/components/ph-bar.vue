@@ -56,7 +56,9 @@ export default {
           localStorage.phToken = process.env.PH_TOKEN;
           console.error('PH _getAuth:', err.body);
         }).then(() => {
-          this.getPosts();
+          if (localStorage.phToken) {
+            this.getPosts();
+          }
         });
     },
     getPosts() {
