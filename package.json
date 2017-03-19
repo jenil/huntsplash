@@ -1,0 +1,21 @@
+{
+  "name": "HuntSplash",
+  "description": "Product Hunt + Unsplash",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jenil/huntsplash.git"
+  },
+  "scripts": {
+    "lint": "vbuild --eslint",
+    "dev": "vbuild -d",
+    "build": "vbuild"
+  },
+  "devDependencies": {
+    "node-sass": "^4.5.0",
+    "sass-loader": "^6.0.3",
+    "vbuild": "^6.0.0",
+    "vue-resource": "^1.2.1"
+  },
+  "license": "MIT"
+}
