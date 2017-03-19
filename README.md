@@ -4,7 +4,7 @@
 
 Beautiful photos from [Unsplash](https://unsplash.com) along with top trending products on [Product Hunt](https://www.producthunt.com) in every new tab on Google Chrome.
 
-![Chrome Extension](assests/preview.png)
+![Chrome Extension Preview](https://cdn.rawgit.com/jenil/huntsplash/f5b5fe24/assets/preview.png)
 
 ## Chrome App Store
 
