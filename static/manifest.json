@@ -1,8 +1,8 @@
 {
   "name": "HuntSplash",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "manifest_version": 2,
-  "description": "Product Hunt + Unsplash",
+  "description": "See beautiful photos along with top trending products on every new tab you open in Google Chrome.",
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
