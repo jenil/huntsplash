@@ -1,7 +1,7 @@
 <template>
 <div :class="$style.wrapper" ref="scrollContainer">
   <div :class="$style.sidebar">
-    <a :class="$style.header" href="//producthunt.com">
+    <a :class="$style.header" href="https://producthunt.com">
       <svg class="logo" width="64" height="64" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><circle fill="#DA552F" cx="15" cy="15" r="15"/><path d="M13.944 21v-3.808h2.754c2.55 0 3.944-1.717 3.944-3.757 0-2.057-1.394-3.774-3.944-3.774H11.02V21h2.924zm2.312-6.358h-2.312v-2.43h2.312c.782 0 1.41.44 1.41 1.223 0 .765-.628 1.207-1.41 1.207z" fill="#fff"/></g></svg>
       <section>
         <h3>Product Hunt</h3>
