@@ -11,7 +11,7 @@
     <div :class="$style.list">
       <product v-for="p in posts" :key="p.id" :post="p" />
       <br v-if="loading">
-      <a :class="$style.more" v-if="posts.length" href="https://producthunt.com">Keep hunting</a>
+      <a :class="$style.more" v-if="posts.length" href="https://producthunt.com" @click="track">Keep hunting</a>
       <div :class="$style.loader" v-if="loading"></div>
     </div>
   </div>
@@ -85,6 +85,12 @@ export default {
         if (err.status == 401) {
           delete localStorage.phToken;
         }
+      });
+    },
+    track() {
+      window.ga('send', 'event', {
+        'eventCategory': 'click',
+        'eventAction': 'keep hunting'
       });
     }
   }
