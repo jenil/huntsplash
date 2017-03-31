@@ -1,7 +1,7 @@
 <template>
 <div :id="$style.bg" v-if="BG" :style="{ 'background-color': imgColor}">
   <img :src="BG" alt="" @load="loadedImg" @error="errorImg" :class="{ [$style.loaded]: bgLoaded }" ref="BG" crossOrigin="anonymous">
-  <div :class="$style.meta" v-if="author.name">
+  <div v-if="author.name" :class="{[$style.meta]: true, [this.position == 'right' ? $style.right: '']: true}">
     <svg width="16px" viewBox="0 0 104 90" version="1.1" aria-label="Unsplash" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
         <title>Unsplash</title>
         <defs></defs>
@@ -17,6 +17,15 @@
 <script>
 export default {
   name: 'bg',
+  props: ['position'],
+  data() {
+    return {
+      bgLoaded: false,
+      BG: localStorage.bgData || localStorage.BG || '',
+      imgColor: localStorage.imgColor || '#333',
+      author: localStorage.author ? JSON.parse(localStorage.author) : {}
+    }
+  },
   created() {
     if (!process.env.UNSPLASH_APP_ID) {
       console.error('[USP] No UNSPLASH_APP_ID!');
@@ -25,14 +34,6 @@ export default {
   },
   mounted() {
     console.time('BG');
-  },
-  data() {
-    return {
-      bgLoaded: false,
-      BG: localStorage.bgData || localStorage.BG || '',
-      imgColor: localStorage.imgColor || '#333',
-      author: localStorage.author ? JSON.parse(localStorage.author) : {}
-    }
   },
   methods: {
     checkImage() {
@@ -177,6 +178,11 @@ export default {
             color: white;
             text-decoration: underline;
         }
+    }
+
+    .right {
+      left: auto;
+      right: 0;
     }
 }
 </style>

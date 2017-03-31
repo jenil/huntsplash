@@ -6,10 +6,9 @@
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
-  "background": {
-    "scripts": [
-      "main.js"
-    ]
+  "options_ui": {
+    "page": "options.html",
+    "chrome_style": true
   },
   "icons": {
     "16": "icon16.png",
@@ -19,10 +18,7 @@
   "permissions": [
     "*://api.producthunt.com/*",
     "*://api.unsplash.com/*",
-    "webRequestBlocking",
-    "storage",
-    "webRequest",
-    "tabs"
+    "storage"
   ],
   "web_accessible_resources": [
     "main.js",

@@ -1,12 +1,19 @@
-const path = require('path')
-const OfflinePlugin = require('offline-plugin')
-
-// this will copy ./static/** to ./dist/**
 module.exports = options => ({
-  entry: 'src/index.js',
-  filename: {
-    js: 'main.js'
+  entry: {
+    options: 'src/options.js',
+    client: 'src/index.js'
   },
+  filename: {
+    js: '[name].js'
+  },
+  html: [{
+    chunks: ['client'],
+    filename: 'index.html'
+  }, {
+    chunks: ['options'],
+    filename: 'options.html'
+  }],
+  hmrEntry: ['client', 'options'],
   vendor: false,
   sourceMap: false,
   port: 3000,
@@ -18,4 +25,4 @@ module.exports = options => ({
     PH_SECRET: '',
     PH_TOKEN: ''
   }, require('./keys.js'))
-})
+});
