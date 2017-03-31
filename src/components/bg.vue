@@ -18,15 +18,13 @@
 export default {
   name: 'bg',
   created() {
-    // if (this.BG.indexOf('data:') == 0) {
-    //   console.time('BG cached');
-    // } else {
-      console.time('BG');
-    // }
     if (!process.env.UNSPLASH_APP_ID) {
       console.error('[USP] No UNSPLASH_APP_ID!');
     }
     this.checkImage();
+  },
+  mounted() {
+    console.time('BG');
   },
   data() {
     return {
@@ -54,7 +52,7 @@ export default {
             client_id: process.env.UNSPLASH_APP_ID,
             orientation: 'landscape',
             featured: true,
-            w: window.innerWidth
+            w: window.innerWidth // this doesn't work though it is in the API doc
           }
         })
         .then(response => {
@@ -62,8 +60,8 @@ export default {
           console.log('[USP] got new image');
           const img = response.body;
 
-          this.BG = img.urls.full;
-          localStorage.BG = img.urls.full;
+          localStorage.BG = img.urls.full + '&w=' + (window.innerWidth * window.devicePixelRatio); // Fix for width
+          this.BG = localStorage.BG;
 
           this.imgColor = img.color;
           localStorage.imgColor = img.color;
@@ -92,6 +90,12 @@ export default {
       this.bgLoaded = true;
       console.log('[USP] 🏞 loaded from', this.BG.indexOf('data:') === 0 ? 'cache' : 'source');
       console.info('[USP] done. all set!');
+      if (this.BG.indexOf('data:') !== 0) {
+        this.cacheIt();
+      }
+    },
+    cacheIt() {
+      console.info('[USP] Lets cacheIt...');
       var vm = this;
       if (this.BG.indexOf('data') === -1) {
         this.$http.get(this.BG).then(response => {
