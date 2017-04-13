@@ -1,5 +1,5 @@
 <template>
-<article :class="$style.post" @click="open">
+<a :class="$style.post" :href="post.redirect_url" target="_blank">
   <div :class="$style.thumb">
     <img :src="post.thumbnail.image_url" alt="">
   </div>
@@ -13,7 +13,7 @@
       <small>{{post.comments_count}}</small>
     </div>
   </div>
-</article>
+</a>
 </template>
 
 <script>
