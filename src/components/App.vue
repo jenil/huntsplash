@@ -2,18 +2,21 @@
 <div id="app">
   <bg :position="sidebarPosition == 'right' ? 'left' : 'right'" :rate="refreshRate" />
   <sidebar :position="sidebarPosition" />
+  <clock />
 </div>
 </template>
 
 <script>
 import bg from './bg.vue'
 import sidebar from './ph-bar.vue'
+import clock from './clock.vue'
 
 export default {
   name: 'app',
   components: {
     bg,
-    sidebar
+    sidebar,
+    clock
   },
   data() {
     return {
