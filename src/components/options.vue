@@ -10,6 +10,18 @@
         <input type="radio" v-model="sidebarPosition" id="right" value="right"> Right
       </label>
     </dd>
+    <dt>Refresh photo</dt>
+    <dd>
+      <select for="refresh" v-model="refreshRate">
+        <option value="0">every new tab</option>
+        <option value="0.25">every 15 Minutes</option>
+        <option value="0.5">every 30 Minutes</option>
+        <option value="1">every 60 minutes</option>
+        <option value="6">every 6 hours</option>
+        <option value="12">every 12 hours</option>
+        <option value="24">every 24 hours</option>
+      </select>
+    </dd>
   </dl>
   <small v-if="status">{{status}}</small>
 </div>
@@ -20,6 +32,7 @@ export default {
   data() {
     return {
       sidebarPosition: '',
+      refreshRate: '',
       status: ''
     }
   },
@@ -27,10 +40,13 @@ export default {
     console.log('loading options..');
     if (chrome.storage) {
       chrome.storage.sync.get({
-        sidebarPosition: 'right'
+        sidebarPosition: 'right',
+        refreshRate: '24'
       }, function(options) {
         this.sidebarPosition = options.sidebarPosition;
+        this.refreshRate = options.refreshRate;
         console.log(this.sidebarPosition)
+        console.log(this.refreshRate)
       }.bind(this));
     }
   },
@@ -40,6 +56,20 @@ export default {
       if (chrome.storage && old) {
         chrome.storage.sync.set({
           sidebarPosition: vm.sidebarPosition,
+        }, function() {
+          console.log('Saved!');
+          vm.status = 'Options saved.';
+          setTimeout(function() {
+            vm.status = '';
+          }, 1000);
+        });
+      }
+    },
+    refreshRate: function(neu, old) {
+      const vm = this;
+      if (chrome.storage && old) {
+        chrome.storage.sync.set({
+          refreshRate: vm.refreshRate,
         }, function() {
           console.log('Saved!');
           vm.status = 'Options saved.';

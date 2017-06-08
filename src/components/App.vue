@@ -1,6 +1,6 @@
 <template>
 <div id="app">
-  <bg :position="sidebarPosition == 'right' ? 'left' : 'right'" />
+  <bg :position="sidebarPosition == 'right' ? 'left' : 'right'" :rate="refreshRate" />
   <sidebar :position="sidebarPosition" />
 </div>
 </template>
@@ -17,7 +17,8 @@ export default {
   },
   data() {
     return {
-      sidebarPosition: localStorage.sidebarPosition || 'left'
+      sidebarPosition: localStorage.sidebarPosition || 'left',
+      refreshRate: localStorage.refreshRate || '24'
     }
   },
   created() {
@@ -31,10 +32,13 @@ export default {
     if (chrome.storage) {
       console.log('[App] syncing ⚙️...');
       chrome.storage.sync.get({
-        sidebarPosition: 'right'
+        sidebarPosition: 'right',
+        refreshRate: '24'
       }, function(options) {
         this.sidebarPosition = options.sidebarPosition;
+        this.refreshRate = options.refreshRate;
         localStorage.sidebarPosition = options.sidebarPosition;
+        localStorage.refreshRate = options.refreshRate;
         console.info('[App] ⚙️ synced!');
       }.bind(this));
     }

@@ -17,7 +17,7 @@
 <script>
 export default {
   name: 'bg',
-  props: ['position'],
+  props: ['position', 'rate'],
   data() {
     return {
       bgLoaded: false,
@@ -40,7 +40,8 @@ export default {
       let then = localStorage.tsUpdatedImage ? JSON.parse(localStorage.tsUpdatedImage) : null;
       let now = new Date().getTime();
       console.log('[USP] image since:', (now - then) / 1000, 'secs -', (now - then) / 1000 / 3600, 'hrs');
-      if (then && (now - then) / 1000 < 12 * 3600) {
+      console.log('[USP] refresh rate: ', this.rate * 3600, ' seconds');
+      if (then && (now - then) / 1000 < this.rate * 3600) {
         console.log('[USP] using old image');
       } else {
         console.log('[USP] getting new image');
