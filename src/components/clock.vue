@@ -43,7 +43,7 @@ export default {
 <style>
 .center {
   position: absolute;
-  top:40%;
+  top:85%;
   left:50%;
   -webkit-transform:translate(-50%, -50%);
 }
@@ -57,7 +57,7 @@ export default {
 .clock__hourtime {
   display: inline-block;
   color: #fff;
-  font-size: 7rem;
+  font-size: 5rem;
   font-weight: 500;
   padding: 0 0;
   text-align: center;
@@ -70,7 +70,7 @@ export default {
 .clock__seconds {
 }
 .clock__hourtime {
-  font-size: 1.2rem;
+  font-size: 1.0rem;
 }
 
 </style>

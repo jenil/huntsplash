@@ -15,6 +15,7 @@
 </template>
 
 <script>
+
 export default {
   name: 'bg',
   props: ['position', 'rate'],
@@ -23,7 +24,12 @@ export default {
       bgLoaded: false,
       BG: localStorage.bgData || localStorage.BG || '',
       imgColor: localStorage.imgColor || '#333',
-      author: localStorage.author ? JSON.parse(localStorage.author) : {}
+      author: localStorage.author ? JSON.parse(localStorage.author) : {},
+
+      // Pre-load and cache the next image so we stay 1 ahead at all times
+      nextBG: localStorage.nextBgData || localStorage.nextBG || '',
+      nextImgColor: localStorage.nextImgColor || '#333',
+      nextAuthor: localStorage.nextAuthor ? JSON.parse(localStorage.nextAuthor) : {}
     }
   },
   created() {
@@ -42,13 +48,38 @@ export default {
       console.log('[USP] image since:', (now - then) / 1000, 'secs -', (now - then) / 1000 / 3600, 'hrs');
       console.log('[USP] refresh rate: ', this.rate * 3600, ' seconds');
       if (then && (now - then) / 1000 < this.rate * 3600) {
-        console.log('[USP] using old image');
+        this.getCurrentImage();
       } else {
-        console.log('[USP] getting new image');
-        this.getImage();
+        this.getNewImage();
       }
     },
-    getImage() {
+    getCurrentImage() {
+      console.log('[USP] using old image');
+    },
+    swapImages() {
+        localStorage.BG = localStorage.nextBG;
+        this.BG = localStorage.nextBG;
+
+        localStorage.bgData = localStorage.nextBgData;
+
+        localStorage.imgColor = localStorage.nextImgColor;
+        this.imgColor = localStorage.nextImgColor;
+
+        this.author = localStorage.nextAuthor ? JSON.parse(localStorage.nextAuthor) : null;
+        localStorage.author = localStorage.nextAuthor;
+
+        localStorage.image = localStorage.nextImage;
+    },
+    getNewImage() {
+        console.log('[USP] getting new image');
+
+        //set the pre-loaded next image as the current if there is one
+        if (localStorage.nextBG) {
+            this.swapImages();
+        }
+
+        localStorage.tsUpdatedImage = new Date().getTime();
+
       this.$http.get(`https://api.unsplash.com/photos/random`, {
           params: {
             client_id: process.env.UNSPLASH_APP_ID,
@@ -58,34 +89,39 @@ export default {
           }
         })
         .then(response => {
-          // console.log('[USP] unsplash response', response.body);
           console.log('[USP] got new image');
           const img = response.body;
 
-          localStorage.BG = img.urls.full + '&w=' + (window.innerWidth * window.devicePixelRatio); // Fix for width
-          this.BG = localStorage.BG;
+          localStorage.nextBG = img.urls.full + '&w=' + (window.innerWidth * window.devicePixelRatio); // Fix for width
+          this.nextBG = localStorage.nextBG;
 
-          this.imgColor = img.color;
-          localStorage.imgColor = img.color;
+          this.nextImgColor = img.color;
+          localStorage.nextImgColor = img.color;
 
           let author = {
             name: img.user.name,
             link: img.links.html
           };
-          this.author = author;
-          localStorage.author = JSON.stringify(author);
+          this.nextAuthor = author;
+          localStorage.nextAuthor = JSON.stringify(author);
 
-          localStorage.image = img.id
-          localStorage.tsUpdatedImage = new Date().getTime();
+          localStorage.nextImage = img.id
+
+          this.cacheBG(this.nextBG);
+
+          // If the current bg still hasnt loaded by now, use this one (initial install)
+          // There may be a more elegant way to do this
+          if (!localStorage.BG) {
+              this.swapImages();
+          }
+
         }, err => {
           // error callback
           console.error('[USP] Unsplash:', err.body);
-          delete localStorage.clear();
-
-          // fallback
-          this.BG = 'https://source.unsplash.com/random';
-          localStorage.BG = 'https://source.unsplash.com/random';
+          this.getCurrentImage(); // TODO: default to cached image if unsplash api quota is reached
         });
+
+
     },
     loadedImg() {
       console.timeEnd('BG');
@@ -93,17 +129,17 @@ export default {
       console.log('[USP] 🏞 loaded from', this.BG.indexOf('data:') === 0 ? 'cache' : 'source');
       console.info('[USP] done. all set!');
       if (this.BG.indexOf('data:') !== 0) {
-        this.cacheIt();
+        this.cacheBG(this.BG);
       }
     },
-    cacheIt() {
-      console.info('[USP] Lets cacheIt...');
+    cacheBG(cacheBG) {
+      console.info('[USP] Lets cache the BG: ', cacheBG);
       var vm = this;
-      if (this.BG.indexOf('data') === -1) {
-        this.$http.get(this.BG).then(response => {
+      if (cacheBG.indexOf('data') === -1) {
+        this.$http.get(cacheBG).then(response => {
           return response.blob();
         }).then(blob => {
-          var url = URL.createObjectURL(blob);
+          var url = window.URL.createObjectURL(blob);
           var img = new Image();
           img.setAttribute('crossOrigin', 'anonymous');
           img.onload = function() {
@@ -113,13 +149,18 @@ export default {
             var ctx = canvas.getContext("2d");
             ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
             var data = canvas.toDataURL("image/jpeg");
-            localStorage.bgData = data;
-            console.info('BG Cached! 🍺');
+            if (cacheBG == this.BG) {
+                console.info('BG Cached! 🍺');
+                localStorage.bgData = data;
+            } else if (cacheBG == this.nextBG) {
+                console.info('Next BG Cached! 🍺');
+                localStorage.nextBgData = data;
+            }
           };
           console.log('[USP] trying to cache from', url);
           img.src = url;
         }).catch(err => {
-          console.error('[USP] Failed to Cache BG');
+          console.error('[USP] Failed to Cache BG: ', err);
         });
       }
     },
@@ -156,7 +197,7 @@ export default {
         transform: translate(-50%, -50%);
 
         opacity: 0;
-        transition: all 300ms ease-in;
+        transition: all 200ms ease-in;
         &.loaded {
             opacity: 1;
         }
