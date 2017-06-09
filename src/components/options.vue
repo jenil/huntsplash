@@ -14,8 +14,8 @@
     <dd>
       <select for="refresh" v-model="refreshRate">
         <option value="0">every new tab</option>
-        <option value="0.25">every 15 Minutes</option>
-        <option value="0.5">every 30 Minutes</option>
+        <option value="0.25">every 15 minutes</option>
+        <option value="0.5">every 30 minutes</option>
         <option value="1">every 60 minutes</option>
         <option value="6">every 6 hours</option>
         <option value="12">every 12 hours</option>
