@@ -6,12 +6,13 @@
       <div class="clock__hours">{{hours}}</div>
       <div class="clock__minutes">:{{minutes}}</div>
       <span class="clock__hourtime">{{hourtime}}</span>
+      <div class="clock__greeting">{{greeting}}</div>
     </div>
   </div>
 </template>
 
 <script>
-import { getHourTime, getZeroPad } from '../filters'
+import { getHourTime, getZeroPad, getGreeting } from '../filters'
 export default {
   data () {
     return {
@@ -34,6 +35,7 @@ export default {
       this.minutes = getZeroPad(now.getMinutes())
       this.seconds = getZeroPad(now.getSeconds())
       this.hourtime = getHourTime(this.hours)
+      this.greeting = getGreeting(this.hours)
       this.hours = this.hours % 12 || 12
     }
   }
@@ -58,6 +60,15 @@ export default {
   display: inline-block;
   color: #fff;
   font-size: 5rem;
+  font-weight: 500;
+  padding: 0 0;
+  text-align: center;
+  position: relative;
+}
+.clock__greeting {
+  display: block;
+  color: #fff;
+  font-size: 3rem;
   font-weight: 500;
   padding: 0 0;
   text-align: center;

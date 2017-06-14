@@ -136,7 +136,7 @@ export default {
       console.info('[USP] Lets cache the BG: ', cacheBG);
       var vm = this;
       if (cacheBG.indexOf('data') === -1) {
-        this.$http.get(cacheBG).then(response => {
+        this.$http.get(cacheBG, { responseType: 'blob' }).then(response => {
           return response.blob();
         }).then(blob => {
           var url = window.URL.createObjectURL(blob);
@@ -149,10 +149,10 @@ export default {
             var ctx = canvas.getContext("2d");
             ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
             var data = canvas.toDataURL("image/jpeg");
-            if (cacheBG == this.BG) {
+            if (cacheBG == localStorage.BG) {
                 console.info('BG Cached! 🍺');
                 localStorage.bgData = data;
-            } else if (cacheBG == this.nextBG) {
+            } else if (cacheBG == localStorage.nextBG) {
                 console.info('Next BG Cached! 🍺');
                 localStorage.nextBgData = data;
             }
