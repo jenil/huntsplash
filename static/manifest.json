@@ -1,6 +1,6 @@
 {
   "name": "HuntSplash: Beautiful Photos & Top Products",
-  "version": "0.0.7",
+  "version": "1.0.0",
   "manifest_version": 2,
   "description": "See beautiful photos along with top trending products on every new tab you open in Google Chrome.",
   "chrome_url_overrides": {
