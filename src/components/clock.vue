@@ -1,20 +1,24 @@
 <!-- From https://github.com/dangvanthanh/vue-clock -->
 
 <template>
-  <div class="center">
-    <div class="clock">
-      <div class="clock__hours">{{hours}}</div>
-      <div class="clock__minutes">:{{minutes}}</div>
-      <span class="clock__hourtime">{{hourtime}}</span>
-      <div class="clock__greeting">{{greeting}}</div>
-    </div>
+<div class="center">
+  <div class="clock">
+    <div class="clock__hours">{{hours}}</div>
+    <div class="clock__minutes">:{{minutes}}</div>
+    <span class="clock__hourtime">{{hourtime}}</span>
+    <div class="clock__greeting">{{greeting}}</div>
   </div>
+</div>
 </template>
 
 <script>
-import { getHourTime, getZeroPad, getGreeting } from '../filters'
+import {
+  getHourTime,
+  getZeroPad,
+  getGreeting
+} from '../filters'
 export default {
-  data () {
+  data() {
     return {
       hours: '',
       minutes: '',
@@ -25,11 +29,11 @@ export default {
   created() {
     this.updateDateTime();
   },
-  mounted () {
+  mounted() {
     setInterval(this.updateDateTime, 1000)
   },
   methods: {
-    updateDateTime () {
+    updateDateTime() {
       let now = new Date()
       this.hours = now.getHours()
       this.minutes = getZeroPad(now.getMinutes())
@@ -44,15 +48,17 @@ export default {
 
 <style>
 .center {
-    position: fixed;
-    bottom: 0.5rem;
-    left: 50%;
-    -webkit-transform: translate(-50%, 0%);
+  position: fixed;
+  bottom: 0.5rem;
+  left: 50%;
+  -webkit-transform: translate(-50%, 0%);
 }
+
 .clock {
   display: inline-block;
   text-align: center;
 }
+
 .clock__hours,
 .clock__minutes,
 .clock__seconds,
@@ -66,6 +72,7 @@ export default {
   text-align: center;
   position: relative;
 }
+
 .clock__greeting {
   display: block;
   color: #fff;
@@ -75,14 +82,14 @@ export default {
   text-align: center;
   position: relative;
 }
-.clock__hours {
-}
-.clock__minutes {
-}
-.clock__seconds {
-}
+
+.clock__hours {}
+
+.clock__minutes {}
+
+.clock__seconds {}
+
 .clock__hourtime {
   font-size: 1.0rem;
 }
-
 </style>

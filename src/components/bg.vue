@@ -15,7 +15,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'bg',
   props: ['position', 'rate'],
@@ -57,35 +56,36 @@ export default {
       console.log('[USP] using old image');
     },
     swapImages() {
-        localStorage.BG = localStorage.nextBG;
-        this.BG = localStorage.nextBG;
+      console.log('[USP] loading next image');
+      localStorage.BG = localStorage.nextBG;
+      this.BG = localStorage.nextBG;
 
-        localStorage.bgData = localStorage.nextBgData;
+      localStorage.bgData = localStorage.nextBgData;
 
-        localStorage.imgColor = localStorage.nextImgColor;
-        this.imgColor = localStorage.nextImgColor;
+      localStorage.imgColor = localStorage.nextImgColor;
+      this.imgColor = localStorage.nextImgColor;
 
-        this.author = localStorage.nextAuthor ? JSON.parse(localStorage.nextAuthor) : null;
-        localStorage.author = localStorage.nextAuthor;
+      this.author = localStorage.nextAuthor ? JSON.parse(localStorage.nextAuthor) : null;
+      localStorage.author = localStorage.nextAuthor;
 
-        localStorage.image = localStorage.nextImage;
+      localStorage.image = localStorage.nextImage;
     },
     getNewImage() {
-        console.log('[USP] getting new image');
+      console.log('[USP] getting new image');
 
-        //set the pre-loaded next image as the current if there is one
-        if (localStorage.nextBG) {
-            this.swapImages();
-        }
+      //set the pre-loaded next image as the current if there is one
+      if (localStorage.nextBG) {
+        this.swapImages();
+      }
 
-        localStorage.tsUpdatedImage = new Date().getTime();
+      localStorage.tsUpdatedImage = new Date().getTime();
 
       this.$http.get(`https://api.unsplash.com/photos/random`, {
           params: {
             client_id: process.env.UNSPLASH_APP_ID,
             orientation: 'landscape',
             featured: true,
-            w: window.innerWidth // this doesn't work though it is in the API doc
+            w: (window.innerWidth * window.devicePixelRatio) // this doesn't work though it is in the API doc
           }
         })
         .then(response => {
@@ -112,7 +112,7 @@ export default {
           // If the current bg still hasnt loaded by now, use this one (initial install)
           // There may be a more elegant way to do this
           if (!localStorage.BG) {
-              this.swapImages();
+            this.swapImages();
           }
 
         }, err => {
@@ -136,7 +136,9 @@ export default {
       console.info('[USP] Lets cache the BG: ', cacheBG);
       var vm = this;
       if (cacheBG.indexOf('data') === -1) {
-        this.$http.get(cacheBG, { responseType: 'blob' }).then(response => {
+        this.$http.get(cacheBG, {
+          responseType: 'blob'
+        }).then(response => {
           return response.blob();
         }).then(blob => {
           var url = window.URL.createObjectURL(blob);
@@ -150,11 +152,11 @@ export default {
             ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
             var data = canvas.toDataURL("image/jpeg");
             if (cacheBG == localStorage.BG) {
-                console.info('BG Cached! 🍺');
-                localStorage.bgData = data;
+              console.info('BG Cached! 🍺');
+              localStorage.bgData = data;
             } else if (cacheBG == localStorage.nextBG) {
-                console.info('Next BG Cached! 🍺');
-                localStorage.nextBgData = data;
+              console.info('Next BG Cached! 🍺');
+              localStorage.nextBgData = data;
             }
           };
           console.log('[USP] trying to cache from', url);
@@ -223,8 +225,8 @@ export default {
     }
 
     .right {
-      left: auto;
-      right: 0;
+        left: auto;
+        right: 0;
     }
 }
 </style>

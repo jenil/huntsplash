@@ -84,7 +84,7 @@ export default {
 
 <style lang="scss">
 body {
-    font-family: 'Proxima Nova',  -apple-system, BlinkMacSystemFont, Avenir, "Avenir Next", "Segoe UI", sans-serif;
+    font-family: 'Proxima Nova', -apple-system, BlinkMacSystemFont, Avenir, "Avenir Next", "Segoe UI", sans-serif;
     color: #333;
     padding: 0;
     margin: 0;
@@ -121,6 +121,6 @@ label + label {
     margin-left: 1rem;
 }
 small {
-  color: rgb(0, 168, 88);
+    color: rgb(0, 168, 88);
 }
 </style>

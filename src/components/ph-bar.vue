@@ -110,7 +110,7 @@ export default {
     background: linear-gradient(to right, rgba(0,0,0,0) 40%,rgba(0,0,0,0.6) 100%);
 
     &.leftBG {
-      background: linear-gradient(to left, transparent 40%, rgba(0, 0, 0, 0.6) 100%)
+        background: linear-gradient(to left, transparent 40%, rgba(0, 0, 0, 0.6) 100%);
     }
 }
 .sidebar {
@@ -121,8 +121,8 @@ export default {
     margin: 0.5rem 0;
 }
 .left {
-  left: 0;
-  right: auto;
+    left: 0;
+    right: auto;
 }
 .header {
     display: flex;
