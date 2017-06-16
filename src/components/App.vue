@@ -1,23 +1,27 @@
 <template>
 <div id="app">
-  <bg :position="sidebarPosition == 'right' ? 'left' : 'right'" />
+  <bg :position="sidebarPosition == 'right' ? 'left' : 'right'" :rate="refreshRate" />
   <sidebar :position="sidebarPosition" />
+  <clock />
 </div>
 </template>
 
 <script>
 import bg from './bg.vue'
 import sidebar from './ph-bar.vue'
+import clock from './clock.vue'
 
 export default {
   name: 'app',
   components: {
     bg,
-    sidebar
+    sidebar,
+    clock
   },
   data() {
     return {
-      sidebarPosition: localStorage.sidebarPosition || 'left'
+      sidebarPosition: localStorage.sidebarPosition || 'left',
+      refreshRate: localStorage.refreshRate || '24'
     }
   },
   created() {
@@ -31,10 +35,13 @@ export default {
     if (chrome.storage) {
       console.log('[App] syncing ⚙️...');
       chrome.storage.sync.get({
-        sidebarPosition: 'right'
+        sidebarPosition: 'right',
+        refreshRate: '24'
       }, function(options) {
         this.sidebarPosition = options.sidebarPosition;
+        this.refreshRate = options.refreshRate;
         localStorage.sidebarPosition = options.sidebarPosition;
+        localStorage.refreshRate = options.refreshRate;
         console.info('[App] ⚙️ synced!');
       }.bind(this));
     }

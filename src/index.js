@@ -1,5 +1,6 @@
 import Vue from 'vue'
-var VueResource = require('vue-resource');
+import VueResource from 'vue-resource';
+
 import App from '@/components/App'
 
 Vue.use(VueResource);

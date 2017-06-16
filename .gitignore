@@ -6,4 +6,5 @@ node_modules
 dist
 
 yarn.lock
+package.lock
 keys.js
