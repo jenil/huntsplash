@@ -44,10 +44,10 @@ export default {
 
 <style>
 .center {
-  position: absolute;
-  top:85%;
-  left:50%;
-  -webkit-transform:translate(-50%, -50%);
+    position: fixed;
+    bottom: 0.5rem;
+    left: 50%;
+    -webkit-transform: translate(-50%, 0%);
 }
 .clock {
   display: inline-block;
@@ -61,6 +61,7 @@ export default {
   color: #fff;
   font-size: 5rem;
   font-weight: 500;
+  line-height: 1;
   padding: 0 0;
   text-align: center;
   position: relative;
@@ -68,7 +69,7 @@ export default {
 .clock__greeting {
   display: block;
   color: #fff;
-  font-size: 3rem;
+  font-size: 1.5rem;
   font-weight: 500;
   padding: 0 0;
   text-align: center;
