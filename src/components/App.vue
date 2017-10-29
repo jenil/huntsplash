@@ -7,12 +7,12 @@
 </template>
 
 <script>
-import bg from './bg.vue'
-import sidebar from './ph-bar.vue'
-import clock from './clock.vue'
+import bg from "./bg.vue";
+import sidebar from "./ph-bar.vue";
+import clock from "./clock.vue";
 
 export default {
-  name: 'app',
+  name: "app",
   components: {
     bg,
     sidebar,
@@ -20,49 +20,60 @@ export default {
   },
   data() {
     return {
-      sidebarPosition: localStorage.sidebarPosition || 'left',
-      refreshRate: localStorage.refreshRate || '24'
-    }
+      sidebarPosition: localStorage.sidebarPosition || "left",
+      refreshRate: localStorage.refreshRate || "0.001"
+    };
   },
   created() {
-    console.info('VERSION', process.env.VERSION);
+    console.info("VERSION", process.env.VERSION);
     if (localStorage.version && process.env.VERSION != localStorage.version) {
-      console.info('[App] There is an updated, clearing storage...');
+      console.info("[App] There is an updated, clearing storage...");
       localStorage.clear();
     }
     localStorage.version = process.env.VERSION;
 
     if (chrome.storage) {
-      console.log('[App] syncing ⚙️...');
-      chrome.storage.sync.get({
-        sidebarPosition: 'right',
-        refreshRate: '24'
-      }, function(options) {
-        this.sidebarPosition = options.sidebarPosition;
-        this.refreshRate = options.refreshRate;
-        localStorage.sidebarPosition = options.sidebarPosition;
-        localStorage.refreshRate = options.refreshRate;
-        console.info('[App] ⚙️ synced!');
-      }.bind(this));
+      console.log("[App] syncing ⚙️...");
+      chrome.storage.sync.get(
+        {
+          sidebarPosition: "right",
+          refreshRate: "24"
+        },
+        function(options) {
+          this.sidebarPosition = options.sidebarPosition;
+          this.refreshRate = options.refreshRate;
+          localStorage.sidebarPosition = options.sidebarPosition;
+          localStorage.refreshRate = options.refreshRate;
+          console.info("[App] ⚙️ synced!");
+        }.bind(this)
+      );
     }
 
     (function(i, s, o, g, r, a, m) {
-      i['GoogleAnalyticsObject'] = r;
-      i[r] = i[r] || function() {
-        (i[r].q = i[r].q || []).push(arguments)
-      }, i[r].l = 1 * new Date();
-      a = s.createElement(o),
-        m = s.getElementsByTagName(o)[0];
+      i["GoogleAnalyticsObject"] = r;
+      (i[r] =
+        i[r] ||
+        function() {
+          (i[r].q = i[r].q || []).push(arguments);
+        }),
+        (i[r].l = 1 * new Date());
+      (a = s.createElement(o)), (m = s.getElementsByTagName(o)[0]);
       a.async = 1;
       a.src = g;
-      m.parentNode.insertBefore(a, m)
-    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga'); // Note: https protocol here
-    ga('create', 'UA-24419037-8', 'auto');
-    ga('set', 'checkProtocolTask', function() {}); // Removes failing protocol check. @see: http://stackoverflow.com/a/22152353/1958200
-    ga('require', 'displayfeatures');
-    ga('send', 'pageview', '/newtab.html');
+      m.parentNode.insertBefore(a, m);
+    })(
+      window,
+      document,
+      "script",
+      "https://www.google-analytics.com/analytics.js",
+      "ga"
+    ); // Note: https protocol here
+    ga("create", "UA-24419037-8", "auto");
+    ga("set", "checkProtocolTask", function() {}); // Removes failing protocol check. @see: http://stackoverflow.com/a/22152353/1958200
+    ga("require", "displayfeatures");
+    ga("send", "pageview", "/newtab.html");
   }
-}
+};
 </script>
 
 <style lang="scss" module>

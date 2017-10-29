@@ -16,36 +16,46 @@
 
 <script>
 export default {
-  name: 'bg',
-  props: ['position', 'rate'],
+  name: "bg",
+  props: ["position", "rate"],
   data() {
     return {
       bgLoaded: false,
-      BG: localStorage.bgData || localStorage.BG || '',
-      imgColor: localStorage.imgColor || '#333',
+      BG: localStorage.bgData || localStorage.BG || "",
+      imgColor: localStorage.imgColor || "#333",
       author: localStorage.author ? JSON.parse(localStorage.author) : {},
 
       // Pre-load and cache the next image so we stay 1 ahead at all times
-      nextBG: localStorage.nextBgData || localStorage.nextBG || '',
-      nextImgColor: localStorage.nextImgColor || '#333',
-      nextAuthor: localStorage.nextAuthor ? JSON.parse(localStorage.nextAuthor) : {}
-    }
+      nextBG: localStorage.nextBgData || localStorage.nextBG || "",
+      nextImgColor: localStorage.nextImgColor || "#333",
+      nextAuthor: localStorage.nextAuthor
+        ? JSON.parse(localStorage.nextAuthor)
+        : {}
+    };
   },
   created() {
     if (!process.env.UNSPLASH_APP_ID) {
-      console.error('[USP] No UNSPLASH_APP_ID!');
+      console.error("[USP] No UNSPLASH_APP_ID!");
     }
     this.checkImage();
   },
   mounted() {
-    console.time('BG');
+    console.time("BG");
   },
   methods: {
     checkImage() {
-      let then = localStorage.tsUpdatedImage ? JSON.parse(localStorage.tsUpdatedImage) : null;
+      let then = localStorage.tsUpdatedImage
+        ? JSON.parse(localStorage.tsUpdatedImage)
+        : null;
       let now = new Date().getTime();
-      console.log('[USP] image since:', (now - then) / 1000, 'secs -', (now - then) / 1000 / 3600, 'hrs');
-      console.log('[USP] refresh rate: ', this.rate * 3600, ' seconds');
+      console.log(
+        "[USP] image since:",
+        (now - then) / 1000,
+        "secs -",
+        (now - then) / 1000 / 3600,
+        "hrs"
+      );
+      console.log("[USP] refresh rate: ", this.rate * 3600, " seconds");
       if (then && (now - then) / 1000 < this.rate * 3600) {
         this.getCurrentImage();
       } else {
@@ -53,126 +63,148 @@ export default {
       }
     },
     getCurrentImage() {
-      console.log('[USP] using old image');
+      console.log("[USP] using old image");
     },
     swapImages() {
-      console.log('[USP] loading next image');
+      console.log("[USP] Swapping to next image");
       localStorage.BG = localStorage.nextBG;
-      this.BG = localStorage.nextBG;
+      this.BG = localStorage.nextBgData || localStorage.nextBG;
 
-      localStorage.bgData = localStorage.nextBgData;
+      if (localStorage.nextBgData) {
+        try {
+          const tempBG = localStorage.nextBgData;
+          localStorage.removeItem("nextBgData");
+          localStorage.removeItem("bgData");
+          localStorage.bgData = tempBG;
+        } catch (e) {
+          console.log("[USP] Failed to swapImages");
+          console.error("[USP]", e);
+        }
+      }
 
       localStorage.imgColor = localStorage.nextImgColor;
       this.imgColor = localStorage.nextImgColor;
 
-      this.author = localStorage.nextAuthor ? JSON.parse(localStorage.nextAuthor) : null;
+      this.author = localStorage.nextAuthor
+        ? JSON.parse(localStorage.nextAuthor)
+        : null;
       localStorage.author = localStorage.nextAuthor;
 
       localStorage.image = localStorage.nextImage;
     },
-    getNewImage() {
-      console.log('[USP] getting new image');
+    getNewImage(swap = true) {
+      console.log("[USP] getting new image");
 
       //set the pre-loaded next image as the current if there is one
-      if (localStorage.nextBG) {
+      if (localStorage.nextBG && swap) {
         this.swapImages();
       }
 
       localStorage.tsUpdatedImage = new Date().getTime();
 
-      this.$http.get(`https://api.unsplash.com/photos/random`, {
+      this.$http
+        .get(`https://api.unsplash.com/photos/random`, {
           params: {
             client_id: process.env.UNSPLASH_APP_ID,
-            orientation: 'landscape',
+            orientation: "landscape",
             featured: true,
-            w: (window.innerWidth * window.devicePixelRatio) // this doesn't work though it is in the API doc
+            w: window.innerWidth * window.devicePixelRatio // this doesn't work though it is in the API doc
           }
         })
-        .then(response => {
-          console.log('[USP] got new image');
-          const img = response.body;
+        .then(
+          response => {
+            console.log("[USP] got new image");
+            const img = response.body;
 
-          localStorage.nextBG = img.urls.full + '&w=' + (window.innerWidth * window.devicePixelRatio); // Fix for width
-          this.nextBG = localStorage.nextBG;
+            localStorage.nextBG =
+              img.urls.full +
+              "&w=" +
+              window.innerWidth * window.devicePixelRatio; // Fix for width
+            this.nextBG = localStorage.nextBG;
 
-          this.nextImgColor = img.color;
-          localStorage.nextImgColor = img.color;
+            this.nextImgColor = img.color;
+            localStorage.nextImgColor = img.color;
 
-          let author = {
-            name: img.user.name,
-            link: img.links.html
-          };
-          this.nextAuthor = author;
-          localStorage.nextAuthor = JSON.stringify(author);
+            let author = {
+              name: img.user.name,
+              link: img.links.html
+            };
+            this.nextAuthor = author;
+            localStorage.nextAuthor = JSON.stringify(author);
 
-          localStorage.nextImage = img.id
+            localStorage.nextImage = img.id;
 
-          this.cacheBG(this.nextBG);
+            this.cacheBG(this.nextBG);
 
-          // If the current bg still hasnt loaded by now, use this one (initial install)
-          // There may be a more elegant way to do this
-          if (!localStorage.BG) {
-            this.swapImages();
+            // If the current bg still hasnt loaded by now, use this one (initial install)
+            // There may be a more elegant way to do this
+            if (!localStorage.BG) {
+              this.swapImages();
+              this.getNewImage(false);
+            }
+          },
+          err => {
+            // error callback
+            console.error("[USP] Unsplash:", err.body);
+            this.getCurrentImage(); // TODO: default to cached image if unsplash api quota is reached
           }
-
-        }, err => {
-          // error callback
-          console.error('[USP] Unsplash:', err.body);
-          this.getCurrentImage(); // TODO: default to cached image if unsplash api quota is reached
-        });
-
-
+        );
     },
     loadedImg() {
-      console.timeEnd('BG');
+      console.timeEnd("BG");
       this.bgLoaded = true;
-      console.log('[USP] 🏞 loaded from', this.BG.indexOf('data:') === 0 ? 'cache' : 'source');
-      console.info('[USP] done. all set!');
-      if (this.BG.indexOf('data:') !== 0) {
-        this.cacheBG(this.BG);
-      }
+      console.log(
+        "[USP] 🏞 loaded from",
+        this.BG.indexOf("data:") === 0 ? "cache" : "source"
+      );
+      console.info("[USP] done. all set!");
     },
     cacheBG(cacheBG) {
-      console.info('[USP] Lets cache the BG: ', cacheBG);
+      console.info("[USP] Lets cache the BG: ", cacheBG);
       var vm = this;
-      if (cacheBG.indexOf('data') === -1) {
-        this.$http.get(cacheBG, {
-          responseType: 'blob'
-        }).then(response => {
-          return response.blob();
-        }).then(blob => {
-          var url = window.URL.createObjectURL(blob);
-          var img = new Image();
-          img.setAttribute('crossOrigin', 'anonymous');
-          img.onload = function() {
-            var canvas = document.createElement("canvas");
-            canvas.width = (window.innerWidth || 1280) * window.devicePixelRatio;
-            canvas.height = (this.height / this.width) * canvas.width;
-            var ctx = canvas.getContext("2d");
-            ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
-            var data = canvas.toDataURL("image/jpeg");
-            if (cacheBG == localStorage.BG) {
-              console.info('BG Cached! 🍺');
-              localStorage.bgData = data;
-            } else if (cacheBG == localStorage.nextBG) {
-              console.info('Next BG Cached! 🍺');
-              localStorage.nextBgData = data;
-            }
-          };
-          console.log('[USP] trying to cache from', url);
-          img.src = url;
-        }).catch(err => {
-          console.error('[USP] Failed to Cache BG: ', err);
-        });
+      if (cacheBG.indexOf("data") === -1) {
+        this.$http
+          .get(cacheBG, {
+            responseType: "blob"
+          })
+          .then(response => {
+            return response.blob();
+          })
+          .then(blob => {
+            var url = window.URL.createObjectURL(blob);
+            var img = new Image();
+            img.setAttribute("crossOrigin", "anonymous");
+            img.onload = function() {
+              var canvas = document.createElement("canvas");
+              canvas.width =
+                (window.innerWidth || 1280) * window.devicePixelRatio;
+              canvas.height = this.height / this.width * canvas.width;
+              var ctx = canvas.getContext("2d");
+              ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+              var data = canvas.toDataURL("image/jpeg");
+              if (cacheBG == localStorage.BG) {
+                console.info("BG Cached! 🍺");
+                localStorage.bgData = data;
+              } else if (cacheBG == localStorage.nextBG) {
+                console.info("Next BG Cached! 🍺");
+                localStorage.nextBgData = data;
+              }
+            };
+            console.log("[USP] trying to cache from", url);
+            img.src = url;
+          })
+          .catch(err => {
+            console.error("[USP] Failed to Cache BG: ", err);
+          });
       }
     },
     errorImg() {
-      console.warn('BG Cache missed, fallback to fetch image from source');
+      console.warn("BG Cache missed, fallback to fetch image from source");
       this.BG = localStorage.BG;
       delete localStorage.BGblob;
     }
   }
-}
+};
 </script>
 
 <style lang="scss" module>
